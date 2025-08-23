@@ -1,0 +1,165 @@
+{
+  "name": "UI Automation",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 1
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "be89e5ae-5e2b-4a14-b345-fbaf3b1e7b9a",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a0dd722f-a7ad-48d0-856e-ecc486fee828",
+              "name": "Date_time",
+              "value": "={{ new Date().toISOString().replace(/[-:T.Z]/g,'').slice(6,8) + new Date().toISOString().slice(5,7) + new Date().toISOString().slice(0,4) + ':' + new Date().toISOString().slice(11,13) + new Date().toISOString().slice(14,16) + new Date().toISOString().slice(17,19) }}\n",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        208,
+        0
+      ],
+      "id": "dccf04c9-afc4-4acb-bff4-6bd993be53b9",
+      "name": "Date & time"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://78990615f9f1.ngrok-free.app/write",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"message\": \"Hello from n8n Automation!\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        800,
+        0
+      ],
+      "id": "42538423-f820-40c4-aa51-3eeb412cf22a",
+      "name": "AI\\UI_Automation_n8n\\saschicgiftsdemo.txt"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=convert the date and time into the wordings  {{ $('Date & time').item.json.Date_time }}\n\nExample:\ninput:3107202523:10:00\noutput:31st july 2025 - 11:10 PM IST\n#stickly one line output",
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.7,
+      "position": [
+        432,
+        0
+      ],
+      "id": "b96b70de-56fa-4193-ae58-e8abd0e29f0b",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        560,
+        208
+      ],
+      "id": "739006da-fba5-4d11-bdda-a8f1ed0edda1",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "bgowylk4lQbxmiTv",
+          "name": "OpenAi account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Date & time",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Date & time": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "AI\\UI_Automation_n8n\\saschicgiftsdemo.txt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Asia/Kolkata",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "versionId": "c9111c0a-c33a-48a7-acb9-67d6a9574b39",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "be9898397347908cb5982a23b811f8baa03bf4e1962e896d58fa10234caf4845"
+  },
+  "id": "uviXrJMBYWQirV7E",
+  "tags": []
+}

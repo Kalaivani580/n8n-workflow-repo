@@ -1,0 +1,145 @@
+{
+  "name": "everestbuilderassociates.AI",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -272,
+        -48
+      ],
+      "id": "c75841a2-c78f-4984-a9fe-ca6ef85f9162",
+      "name": "Telegram Trigger",
+      "webhookId": "e36f258e-b0e6-4482-900e-f6169e76fd1c",
+      "credentials": {
+        "telegramApi": {
+          "id": "Tq4GhCnFvbBVWvGP",
+          "name": "everestbuilderassociates.AI"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Replay the user requested query :  {{ $json.message.text }}",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "you  are a skilled Personal Assistant"
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.7,
+      "position": [
+        -64,
+        -48
+      ],
+      "id": "63a01a8f-b7e1-42c0-95b0-95bea2f4b19f",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -144,
+        160
+      ],
+      "id": "e62795be-7818-4c88-827e-01a0ec5bfdb4",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "bgowylk4lQbxmiTv",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "={{ $json.text }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        288,
+        -48
+      ],
+      "id": "c09afbc2-1e66-4c69-8c29-14e36999480a",
+      "name": "Send a text message",
+      "webhookId": "df603e6d-bb92-463c-a1ae-d1ae9b081396",
+      "credentials": {
+        "telegramApi": {
+          "id": "Tq4GhCnFvbBVWvGP",
+          "name": "everestbuilderassociates.AI"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "c3969a71-26e3-4acd-82e4-28394db588cf",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "be9898397347908cb5982a23b811f8baa03bf4e1962e896d58fa10234caf4845"
+  },
+  "id": "1KJCsyCl5dEZLIpG",
+  "tags": []
+}

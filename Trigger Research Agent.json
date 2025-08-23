@@ -1,0 +1,404 @@
+{
+  "name": "Trigger Research Agent",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "/research-agent",
+        "responseMode": "lastNode",
+        "options": {
+          "allowedOrigins": "*"
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -1296,
+        192
+      ],
+      "id": "d8b89132-d972-4669-a98c-cb4c94bc665f",
+      "name": "Webhook",
+      "webhookId": "40af2cd4-ddd4-459f-866a-42f2d4305fe2"
+    },
+    {
+      "parameters": {
+        "options": {
+          "hl": "en"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolSerpApi",
+      "typeVersion": 1,
+      "position": [
+        -912,
+        496
+      ],
+      "id": "4bc0c1dd-6502-42ae-8484-c64918f1f23c",
+      "name": "SerpAPI",
+      "credentials": {
+        "serpApi": {
+          "id": "5JGv0x1UiC5QDJD0",
+          "name": "SerpAPI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.query }}\n",
+        "options": {
+          "systemMessage": "You are ResearchAgent-X. Always format your response EXACTLY as:\n\nBLOG:\n# [Title]\n[Your blog content with subheadings and bullet points]\n\nINF:\n• 📊 Stat 1\n• 💡 Insight 2\n• 🚀 Future trend\n\nYou are a helpful assistant, You are **ResearchAgent-X**, an autonomous AI researcher and content creator. Your mission is to independently investigate any given topic, extract the most valuable insights from real-time search results, and produce high-quality, engaging outputs without human intervention.\n\n### 🎯 ROLE & PERSONALITY\n- You are analytical, curious, and precise.\n- You think step-by-step like a scientist and write like a journalist.\n- You prioritize accuracy, relevance, and clarity.\n- You never hallucinate. If information is missing, you state it clearly.\n\n### 🔁 WORKFLOW (Follow this internal process)\n1. **Understand the Topic**: Identify the core subject, its domain (tech, health, finance, etc.), and user intent.\n2. **Analyze Search Results**: Extract key facts, trends, statistics, innovations, and challenges from the provided SERP data.\n3. **Filter & Verify**: Ignore outdated, biased, or unreliable sources. Prefer .gov, .edu, and reputable news sites.\n4. **Structure Output**: Organize findings logically for both blog and infographic.\n5. **Generate Content**: Create two distinct but complementary outputs.\n\n### 📝 OUTPUT RULES\n\n#### ✅ BLOG POST\n- Title: Catchy, SEO-friendly (use power words: \"2025\", \"Trends\", \"Revolution\")\n- Length: 500–600 words\n- Structure: \n  - Engaging intro\n  - 3–4 subheadings with explanations\n  - Bullet points for key ideas\n  - Real stats with years\n  - Simple language (Grade 10–12 level)\n  - Conclusion with future outlook\n- Tone: Professional yet conversational\n\n#### ✅ INFOGRAPHIC TEXT\n- Exactly 5 bullet points\n- Each starts with a relevant emoji (📈, 💡, ⚠️, 🌍, 🚀)\n- Must include:\n  - One **statistic** (e.g., \"75% growth\")\n  - One **prediction** (e.g., \"by 2026\")\n  - One **dollar value** (e.g., \"$10B market\")\n  - One **challenge** (e.g., \"privacy concerns\")\n  - One **innovation** (e.g., \"AI-powered wearables\")\n- Use **bold** for key terms: **$12B**, **90% accuracy**\n- No overlap with blog content\n\n### 🧩 FORMAT (Strictly follow)\n---\nBLOG:\n# [Catchy Title]\n\n[Introduction paragraph]\n\n## [Subheading 1]\n[Content with bullet points if needed]\n\n## [Subheading 2]\n...\n\nConclusion: [Forward-looking sentence]\n\nINF:\n• 📊 [Point 1 with **stat**]\n• 💡 [Point 2 with **innovation**]\n• ⚠️ [Point 3 with **challenge**]\n• 🌍 [Point 4 with **global trend**]\n• 🚀 [Point 5 with **future prediction**]\n---\n\n### 🚫 NEVER\n- Invent facts or sources\n- Repeat the same info in blog and infographic\n- Use complex jargon without explanation\n- Exceed 600 words\n\n### ✅ ALWAYS\n- Cite real numbers and years\n- Use reliable sources from SERP\n- Think: \"Would a researcher trust this?\"\n\nYou are now active. Begin your analysis."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.1,
+      "position": [
+        -1088,
+        192
+      ],
+      "id": "1aa08096-3a84-4be1-b4b7-2fa43e760674",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4.1-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4.1-mini"
+        },
+        "options": {
+          "maxTokens": 1200,
+          "responseFormat": "text",
+          "temperature": 0.7
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -1216,
+        432
+      ],
+      "id": "87c94214-921d-4b61-8215-c96f76e18647",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "bgowylk4lQbxmiTv",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "lasttopic"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -1088,
+        496
+      ],
+      "id": "61933388-d923-44bf-a143-7d2b28ebe0f9",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.toolWikipedia",
+      "typeVersion": 1,
+      "position": [
+        -752,
+        496
+      ],
+      "id": "31aec856-438d-457d-ab8e-bfe4ae9b4dc7",
+      "name": "Wikipedia"
+    },
+    {
+      "parameters": {
+        "sendTo": "ukcivil4@gmail.com, saschicgifts25@gmail.com",
+        "subject": "=New Research:  {{ $json.topic }}",
+        "message": "=<h2>📌 Research: {{$json['topic']}}</h2>\n<p>{{$json['blog']}}</p>\n<h3>📊 Highlights</h3>\n<pre>{{$json['infographic']}}</pre>",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        -144,
+        192
+      ],
+      "id": "0f2de57f-ac99-4cb1-a2ca-6fe355644501",
+      "name": "Send a message",
+      "webhookId": "ee4c0d35-b26b-4b6a-8647-b443f88879e6",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "OhXLGMGyTLwaB1pi",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1aRjXIQtUUvON2bEP_QkPug1X9gj2z8pnAN9nMBp6EhQ",
+          "mode": "list",
+          "cachedResultName": "Research message and image",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1aRjXIQtUUvON2bEP_QkPug1X9gj2z8pnAN9nMBp6EhQ/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1aRjXIQtUUvON2bEP_QkPug1X9gj2z8pnAN9nMBp6EhQ/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "TOPIC": "={{ $('Code1').item.json.topic }}",
+            "ID": "={{ $json.id }}",
+            "BLOG": "={{ $('Code1').item.json.blog }}",
+            "INFOGRAPHIC": "={{ $('Code1').item.json.infographic }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "ID",
+              "displayName": "ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "TOPIC",
+              "displayName": "TOPIC",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "BLOG",
+              "displayName": "BLOG",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "INFOGRAPHIC",
+              "displayName": "INFOGRAPHIC",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        192,
+        192
+      ],
+      "id": "0af9323e-bd41-4e00-b42a-d35167dfe173",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "2lIbahaHCrU1RVEL",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e00a26b7-912e-4599-ba33-cfffb162bf94",
+              "name": "data",
+              "value": "={   \"output\": \"BLOG: AI is changing healthcare. INF: • 75% hospitals use AI\" }",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -496,
+        192
+      ],
+      "id": "f4864de5-38dd-406a-a72e-e5262db682bc",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "category": "randomData",
+        "randomDataSeed": "// முதலில், $json முழுவதையும் பார் console.log(\"Full JSON:\", $json);  // பின்னர், output இருக்கிறதா என்பதை சரிபார் if (!$json.output) {   console.log(\"Error: $json.output is missing!\");   return { json: { error: \"No output from AI Agent\" } }; }  const output = $json.output;  // இப்போது match செய் const blogMatch = output.match(/BLOG:(.*?)INF:/s); const infographicMatch = output.match(/INF:(.*)/s);  return {   json: {     topic: $json.topic,     blog: blogMatch ? blogMatch[1].trim() : \"No blog found\",     infographic: infographicMatch ? infographicMatch[1].trim() : \"No infographic\"   } };"
+      },
+      "type": "n8n-nodes-base.debugHelper",
+      "typeVersion": 1,
+      "position": [
+        512,
+        192
+      ],
+      "id": "94e45d62-77b0-4f0e-abde-d29ec63806d2",
+      "name": "DebugHelper1"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Code 1: Split AI Output into Blog & Infographic\nif (!$json) {\n  return { json: { topic: \"Unknown\", blog: \"No data\", infographic: \"No data\" } };\n}\n\nlet rawOutput = '';\nif ($json.output) {\n  rawOutput = $json.output;\n} else if ($json.response) {\n  rawOutput = $json.response;\n} else if ($json.text) {\n  rawOutput = $json.text;\n} else if ($json.message) {\n  rawOutput = $json.message;\n} else if ($json.data && $json.data.text) {\n  rawOutput = $json.data.text;\n} else {\n  rawOutput = \"ERROR: No valid output from AI Agent\";\n}\n\nconst blogMatch = rawOutput.match(/BLOG:(.*?)INF:/is);\nconst infographicMatch = rawOutput.match(/INF:(.*)/is);\n\nconst topic = $json.topic || \"Unknown Topic\";\nconst blog = blogMatch ? blogMatch[1].trim() : \"Blog section not found.\";\nconst infographic = infographicMatch ? infographicMatch[1].trim() : \"Infographic section not found.\";\n\nreturn {\n  json: {\n    topic,\n    blog,\n    infographic,\n    rawOutput\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -736,
+        192
+      ],
+      "id": "298e4827-d41b-4bdd-8eb6-c499226fc90b",
+      "name": "Code1"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SerpAPI": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wikipedia": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        [
+          {
+            "node": "DebugHelper1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code1": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "44a77288-8e04-41e9-b4a0-2d35edbf85f5",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "be9898397347908cb5982a23b811f8baa03bf4e1962e896d58fa10234caf4845"
+  },
+  "id": "BzRmpLc6f0531Xv8",
+  "tags": []
+}

@@ -1,0 +1,128 @@
+{
+  "name": "gmail auto responder",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "filters": {}
+      },
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -240,
+        -32
+      ],
+      "id": "8a6fd8ad-91a0-4423-82e1-782fcf1ccbe6",
+      "name": "Gmail Trigger",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "OhXLGMGyTLwaB1pi",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Dear Sanjay,\n\nI hope you are doing well. We are excited to share some of our latest collections at Saschic Gifts that we believe you will truly enjoy. Each piece has been thoughtfully selected to bring joy and add a special touch to your celebrations.\n\nPlease feel free to reach out if you have any specific preferences or if you’d like assistance in choosing the perfect gift. We are here to make your shopping experience smooth and delightful.\n\nBest regards,\nKalaivani - Saschic Gifts\n\n {{ $json.snippet }}"
+            },
+            {
+              "content": "[\n  {\n    \"role\": \"system\",\n    \"content\": \"You are an expert in writing professional emails.\"\n  },\n  {\n    \"role\": \"user\",\n    \"content\": \"Draft a professional email body for Saschic Gifts.\\n\\nInstructions:\\n- Start with a polite greeting using the name Sanjay (e.g., Dear Sanjay,).\\n- Write the message in clear, polite, and professional English across multiple lines.\\n- Keep the tone friendly and trustworthy.\\n- Do not include a subject line.\\n- End the email with this footer exactly:\\n\\nBest regards,\\nKalaivani - Saschic Gifts\"\n  }\n]\n\n- Start with a polite greeting (e.g., Dear [Name], Hello [Name],).\n- Write the message in clear, polite, and professional English across multiple lines.\n- Keep the tone friendly and trustworthy.\n- Do not include a subject line.\n- End the email with this footer exactly:\n\nBest regards,\nKalaivani - Saschic Gifts\n",
+              "role": "system"
+            }
+          ]
+        },
+        "options": {
+          "temperature": 0.7
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        -32,
+        -32
+      ],
+      "id": "f08aa687-df9b-4ebb-8c99-f197e74dc628",
+      "name": "Message a model",
+      "credentials": {
+        "openAiApi": {
+          "id": "bgowylk4lQbxmiTv",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "reply",
+        "messageId": "={{ $('Gmail Trigger').item.json.id }}",
+        "message": "={{ $json.message.content }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        320,
+        -32
+      ],
+      "id": "024cc57c-d74a-453b-b2dd-8ef871602f75",
+      "name": "Reply to a message",
+      "webhookId": "8895d3cb-8ba3-45aa-851d-f86163a54f3f",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "OhXLGMGyTLwaB1pi",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Reply to a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "d5f5293e-61e2-4d0b-b23f-b5c4db85c3da",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "be9898397347908cb5982a23b811f8baa03bf4e1962e896d58fa10234caf4845"
+  },
+  "id": "2igFWSNkLo1elnMP",
+  "tags": []
+}

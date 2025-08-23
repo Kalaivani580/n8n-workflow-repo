@@ -1,0 +1,604 @@
+{
+  "name": "Telegram AI Agent",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -1008,
+        -176
+      ],
+      "id": "75d85e00-4239-4664-82c7-47f2e3b941d8",
+      "name": "Telegram Trigger",
+      "webhookId": "38141748-16e9-4689-9d66-65adcb4c3fd9",
+      "credentials": {
+        "telegramApi": {
+          "id": "Tq4GhCnFvbBVWvGP",
+          "name": "everestbuilderassociates.AI"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Reply the user message with your intelligence : {{ $json.text }}\n\nName of the user : {{ $('Telegram Trigger').item.json.message.chat.first_name }}",
+        "options": {
+          "systemMessage": "You are a helpful assistant. able to call the tool based on user requirements.\n\n1. serpAPI : call this tool, when user ask lastest data in the internet and current news - do web search.\n\n2. Gmail : call this Gmail tool, if the user wants to send a Gmail to customers/clients. structure the Gmail very professionally and format them correctly. just notify the status to the user if you send the email (Email sent/ failed/ error)\n\nYou are an AI assistant running inside an n8n workflow.  \nYour task is to generate a well‑structured Gmail email for any given purpose and call the Gmail tool with a JSON template.  \nAlways use Tree-of-Thought (ToT) reasoning internally, but only return the final Gmail tool call JSON.\n\nGuidelines for the email:\n- Subject line: Clear, concise, and engaging (max 10 words).\n- Body: 3–6 sentences depending on context.\n- Tone: Adaptable (professional, friendly, formal, or casual) based on the user prompt.\n- Structure: Greeting → Core message → Optional details → Positive closing.\n\nTree-of-Thought Steps:\n1. Understand the purpose of the email from the user prompt.  \n2. Brainstorm 2–3 possible subject lines → select the best one.  \n3. Draft the body:  \n   - Greeting with recipient’s name if available.  \n   - Main message (announcement, update, thank‑you, etc.).  \n   - Extra details or call‑to‑action if relevant.  \n   - Closing line with polite signature.  \n4. Ensure clarity, professionalism, and positivity.  \n5. Output ONLY the Gmail tool call in JSON format:\n\n{\n  \"tool\": \"gmail\",\n  \"action\": \"send_email\",\n  \"parameters\": {\n    \"to\": \"{{$json[\\\"email\\\"]}}\",\n    \"subject\": \"Final chosen subject line\",\n    \"body\": \"Final crafted email body\"\n  }\n}\ncalculator : call this tool when user calculate something\n-----------------------------------------------------------------------\n6. calculator : call this tool when user calculate something"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.1,
+      "position": [
+        -224,
+        -64
+      ],
+      "id": "35508e6c-0346-435b-b0c2-1eac90c4f86f",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -528,
+        144
+      ],
+      "id": "442a4de7-8ef6-445d-a64d-25e3467501cb",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "bgowylk4lQbxmiTv",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "=telagram_ {{ $json.message.chat.id }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -336,
+        176
+      ],
+      "id": "57316540-955e-458a-93de-e5ab81679119",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "={{ $('Telegram Trigger').item.json.message.message_id }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        160,
+        -304
+      ],
+      "id": "e7b5b4fb-6ff9-41a3-9a51-32c109b616df",
+      "name": "Send a text message",
+      "webhookId": "ea0adfc5-0cd4-421c-b85a-e138a8018b09",
+      "credentials": {
+        "telegramApi": {
+          "id": "Tq4GhCnFvbBVWvGP",
+          "name": "everestbuilderassociates.AI"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolSerpApi",
+      "typeVersion": 1,
+      "position": [
+        -176,
+        192
+      ],
+      "id": "111110e7-ed1d-45e4-9abf-053c9b960cb4",
+      "name": "SerpAPI",
+      "credentials": {
+        "serpApi": {
+          "id": "5JGv0x1UiC5QDJD0",
+          "name": "SerpAPI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('To', ``, 'string') }}",
+        "subject": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Subject', ``, 'string') }}",
+        "message": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message', ``, 'string') }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.1,
+      "position": [
+        -48,
+        192
+      ],
+      "id": "1e6792b9-5b84-4eda-b9fb-38411907b1db",
+      "name": "Send a message in Gmail",
+      "webhookId": "769404bd-27e3-4dc9-becd-529aa5fe98cd",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "OhXLGMGyTLwaB1pi",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.toolCalculator",
+      "typeVersion": 1,
+      "position": [
+        112,
+        208
+      ],
+      "id": "2bfd7337-7a0b-422e-ad67-075c0578c0ed",
+      "name": "Calculator"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.message.voice.file_id }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "exists",
+                      "singleValue": true
+                    },
+                    "id": "8538a640-ed0d-4ea6-b3c2-c09c5dbea9f9"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "voice"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "1b281b72-6069-40e5-b072-3027bdcb4441",
+                    "leftValue": "={{ $json.message.text || \"\" }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "exists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "text"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -848,
+        -192
+      ],
+      "id": "6a5be6c5-6d92-48f8-9f13-1212cb9ee2f9",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7ff178f6-eb2b-4af5-954e-f37fd119b134",
+              "name": "text",
+              "value": "={{ $json.message.text }}",
+              "type": "string"
+            },
+            {
+              "id": "1663ae5f-2137-470e-8ea8-80a4143321a0",
+              "name": "",
+              "value": "",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -656,
+        -80
+      ],
+      "id": "72cb51e2-4031-4b62-9c9d-839ceb8ea65d",
+      "name": "Input variable"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "4c8f96fe-4083-4dcb-80cc-0347bad00df8",
+              "name": "text",
+              "value": "={{ $json.text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -416,
+        -176
+      ],
+      "id": "a4a8a7e0-8cd6-46d8-b862-bec79fdc5695",
+      "name": "audio variable"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.output }}",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "summarize the input with high accuracy, ensuring clarity and conciseness, focus on delivering a contextually rich summary that is optimizedfor speech synthesis. remove redundant phrases, introductory statements or remarks.\nThe output should be natural and engaging for an audio format."
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.7,
+      "position": [
+        128,
+        -112
+      ],
+      "id": "b1369f06-4321-4370-b2e6-a683a975e1a6",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        256,
+        208
+      ],
+      "id": "b8d14f5a-dfa6-4303-8460-58c67d5969e5",
+      "name": "OpenAI Chat Model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "bgowylk4lQbxmiTv",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "sendAudio",
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "binaryData": true,
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        736,
+        -128
+      ],
+      "id": "b3fbf7d0-8b04-4762-99e4-30e8404ef655",
+      "name": "Send an audio file",
+      "webhookId": "b6ddce10-0e94-403a-97d8-bcd707e096ff",
+      "credentials": {
+        "telegramApi": {
+          "id": "Tq4GhCnFvbBVWvGP",
+          "name": "everestbuilderassociates.AI"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "fileId": "={{ $json.message.voice.file_id }}"
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -688,
+        -208
+      ],
+      "id": "956e2c9a-5564-4e7d-9015-5f4feae97c86",
+      "name": "Telegram   Get a file",
+      "webhookId": "b2cecd35-4f23-4992-97c1-bbf98da5493e",
+      "credentials": {
+        "telegramApi": {
+          "id": "Tq4GhCnFvbBVWvGP",
+          "name": "everestbuilderassociates.AI"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "operation": "transcribe",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        -544,
+        -320
+      ],
+      "id": "49a23afa-7ffb-485e-9b67-d5bbb76a63ba",
+      "name": "Openai transcribe",
+      "credentials": {
+        "openAiApi": {
+          "id": "bgowylk4lQbxmiTv",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "input": "={{ $json.text }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        480,
+        -128
+      ],
+      "id": "1e5c1b99-0ee7-4b9f-a6e2-9c84b71277c2",
+      "name": "Openai Generate audio",
+      "credentials": {
+        "openAiApi": {
+          "id": "bgowylk4lQbxmiTv",
+          "name": "OpenAi account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SerpAPI": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message in Gmail": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculator": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Telegram   Get a file",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Input variable",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Input variable": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "audio variable": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Openai Generate audio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram   Get a file": {
+      "main": [
+        [
+          {
+            "node": "Openai transcribe",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Openai transcribe": {
+      "main": [
+        [
+          {
+            "node": "audio variable",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Openai Generate audio": {
+      "main": [
+        [
+          {
+            "node": "Send an audio file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "2a25e35d-8141-42ee-b138-9b8fa7376a47",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "be9898397347908cb5982a23b811f8baa03bf4e1962e896d58fa10234caf4845"
+  },
+  "id": "GFLacLuhO0IGON46",
+  "tags": []
+}

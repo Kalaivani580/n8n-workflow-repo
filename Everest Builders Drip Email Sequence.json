@@ -1,0 +1,281 @@
+{
+  "name": "Everest Builders Drip Email Sequence",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "new-lead",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -480,
+        -128
+      ],
+      "id": "bc1fdbfa-7d9f-442c-bbdc-9b9128fa052b",
+      "name": "Webhook",
+      "webhookId": "0531f641-d34f-4e85-810b-ea92f38d5a53"
+    },
+    {
+      "parameters": {
+        "resume": "specificTime",
+        "dateTime": "={{ new Date(Date.now() + 10*1000).toISOString() }}\n"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        160,
+        -128
+      ],
+      "id": "c73e3bdc-4981-45c1-8172-6ebc859b9be2",
+      "name": "Wait",
+      "webhookId": "c32d37c2-d91f-4af7-b818-c5581c9eeda3",
+      "executeOnce": false
+    },
+    {
+      "parameters": {
+        "resume": "specificTime",
+        "dateTime": "={{ new Date(Date.now() + 10*1000).toISOString() }}\n"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        528,
+        -128
+      ],
+      "id": "ce95d5b8-7452-482f-b212-79408a4d4fc6",
+      "name": "Wait1",
+      "webhookId": "51a3663a-e3fa-4f16-a307-fccc53255f66"
+    },
+    {
+      "parameters": {
+        "sendTo": "ukcivil4@gmail.com",
+        "subject": "Welcome to Everest Builders Associates!",
+        "message": "=Hello {{$udhayakumar}},  Thank you for contacting Everest Builders Associates. Our team will reach out to you shortly!  Warm regards, Everest Builders Associates",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        -16,
+        -128
+      ],
+      "id": "227837a4-45a7-4bf1-b39b-b72e3ace7492",
+      "name": "First Day Message",
+      "webhookId": "485e019f-b1a9-4d2d-9416-aae370d314ca",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "OhXLGMGyTLwaB1pi",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "ukcivil4@gmail.com",
+        "subject": "Explore Everest Builders Projects",
+        "message": "=ukcivil4@gmail.com udhayakumar Hi \nHere are some of our most successful building projects.\n\nBest regards,\nEverest Builders Associates",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        336,
+        -128
+      ],
+      "id": "15268883-3586-4349-9569-32a905b410d2",
+      "name": "Third Day Message",
+      "webhookId": "721792eb-84fc-43f7-a4af-f5c14f040979",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "OhXLGMGyTLwaB1pi",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "=ukcivil4@gmail.com",
+        "subject": "“Book Your Free Consultation”",
+        "message": "=HI udhayakumar\nWe hope you enjoyed exploring some of the amazing projects from Everest Builders Associates. \nNow, we’d love to take the next step with you.\n\n👉 Book your free consultation today and let’s discuss how we can turn your vision into reality.\n\nSchedule your consultation here: [Insert Your Booking Link]\n\nWe look forward to working with you!\n\nBest regards,  \nThe Everest Builders Associates Team",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        240,
+        80
+      ],
+      "id": "dfefaf73-d2bc-4fdd-85b1-19fab33e78ad",
+      "name": "Fifth Day Message",
+      "webhookId": "e311685f-aa0b-4e11-b4eb-62ed6287fc93",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "OhXLGMGyTLwaB1pi",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.body.item[0].request.header[0].type }}",
+        "options": {
+          "systemMessage": "You are an expert email marketing assistant. Your job is to write clear, engaging, and conversion-focused drip email sequences for any business or goal.\n\nYour reply should always include:\n1. Subject line\n2. Email body (minimum 5–7 lines)\n3. Call-to-Action (CTA) at the end\n\nWrite in simple English, friendly tone, and avoid too much technical language. Use short paragraphs and persuasive copy style.\n\nWhen I give you the goal or campaign type (e.g., \"new product launch\", \"lead nurturing\", \"course promotion\", etc.), generate an email accordingly.\n\nDo not write explanations or headers like “Here’s your email”. Just give the actual email content directly.\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.1,
+      "position": [
+        -336,
+        -128
+      ],
+      "id": "e4522c02-b3b8-4386-9d5a-39dc63153c4a",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -480,
+        80
+      ],
+      "id": "ad96aa18-74c1-4197-a93c-c2dc62a030c2",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "bgowylk4lQbxmiTv",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "telegram_"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -336,
+        80
+      ],
+      "id": "6f3cb294-39dc-4d44-94b8-453b34d4af94",
+      "name": "Simple Memory"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Third Day Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait1": {
+      "main": [
+        [
+          {
+            "node": "Fifth Day Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "First Day Message": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Third Day Message": {
+      "main": [
+        [
+          {
+            "node": "Wait1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "First Day Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Asia/Kolkata",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "versionId": "1ccc2b26-1d6b-4110-b336-07e25f06af4a",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "be9898397347908cb5982a23b811f8baa03bf4e1962e896d58fa10234caf4845"
+  },
+  "id": "s4ya6jnZqY7Uk4FK",
+  "tags": []
+}

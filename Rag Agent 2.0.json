@@ -1,0 +1,186 @@
+{
+  "name": "Rag Agent 2.0",
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Answer the user query :  {{ $json.executionMode }}",
+        "options": {
+          "systemMessage": "You are a professional email writer. When the user gives a birthday-related prompt, generate a warm and polite birthday email.\nIf the user's message is unclear or too short (like one word), kindly ask for more details like:\n\n\"Could you please clarify your question or provide more details about '{{user's message}}' so that I can assist you effectively? Thank you!\"\n\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.1,
+      "position": [
+        -240,
+        -16
+      ],
+      "id": "106d36c9-b0c5-4fd2-8875-1644cd5dfd5a",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -384,
+        192
+      ],
+      "id": "2333560e-1fff-4459-a23a-b05e768f71f2",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "bgowylk4lQbxmiTv",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "=global_memory"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -240,
+        192
+      ],
+      "id": "358490f7-bed5-495b-b293-5749b738aed2",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "first-agent",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -496,
+        -16
+      ],
+      "id": "a1cad4c4-c069-4cbc-96cb-499e08b86655",
+      "name": "Webhook",
+      "webhookId": "4313d230-44d3-4151-87a2-f74c71f128d3"
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "={{ $json.output }}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        112,
+        -16
+      ],
+      "id": "0241c444-49e8-4c90-b80d-450ace674e97",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "sendTo": "ukcivil4@gmail.com",
+        "subject": "\"birthday wishes\"",
+        "message": "\"wishing you for your best day happy birthday\"",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.1,
+      "position": [
+        -96,
+        192
+      ],
+      "id": "16c67cef-e316-4290-bd8a-a36ce0d54d09",
+      "name": "Send a message in Gmail",
+      "webhookId": "6a1cb506-92b9-4a41-abba-0569c2071a06",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "OhXLGMGyTLwaB1pi",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message in Gmail": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "681ca31c-9fc2-45be-aa50-55c99cb02181",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "be9898397347908cb5982a23b811f8baa03bf4e1962e896d58fa10234caf4845"
+  },
+  "id": "t7mwei5FjY96I5jW",
+  "tags": []
+}

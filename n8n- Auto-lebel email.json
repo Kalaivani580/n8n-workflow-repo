@@ -1,0 +1,215 @@
+{
+  "name": "n8n- Auto-lebel email",
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{(() => {\n  const encoded = $json.payload?.parts?.[0]?.body?.data;\n  const text = Buffer.from(encoded, 'base64').toString('utf-8');\n  return text;\n})()}}\n",
+        "options": {
+          "systemMessage": "=You are an AI email labeler. Based on the email content, return one of the following labels: Work, Personal, Urgent, Spam, Other. Return ONLY the label.\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.1,
+      "position": [
+        -32,
+        -32
+      ],
+      "id": "92d208eb-e8f6-45bf-8b52-7e0ca2e6b5dc",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -112,
+        144
+      ],
+      "id": "cae2e710-6b19-4fc8-8370-7a251cff8f4c",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "bgowylk4lQbxmiTv",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d2f2a9fe-1d32-401b-b43f-e21ac58d8e59",
+              "name": "Map AI Label to Gmail Label ID",
+              "value": "=Add Value",
+              "type": "string"
+            },
+            {
+              "id": "f9d344ec-ad9f-4187-8a63-f850d67d72d5",
+              "name": "labelId",
+              "value": "={{(() => {\n  const label = $json.result.toLowerCase(); // AI output\n  const map = {\n    work: 'Label_123abc',      // 🔁 Replace with your real Gmail label ID for Work\n    personal: 'Label_456def',  // Replace with real ID\n    urgent: 'Label_789ghi',\n    spam: 'SPAM',              // Gmail default label\n    other: 'Label_xyz123'\n  };\n  return map[label] || 'Label_xyz123'; // Default to \"Other\"\n})()}}\n",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        320,
+        -32
+      ],
+      "id": "2c5d1286-a66b-451e-8879-1323a0a487d6",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "operation": "addLabels",
+        "messageId": "={{ $('Get many messages').item.json.id }}",
+        "labelIds": [
+          "INBOX"
+        ]
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        512,
+        -32
+      ],
+      "id": "3c73afe6-a7d4-42d1-a3a8-7c632f0a73cf",
+      "name": "Add label to message",
+      "webhookId": "c31d0fb3-5c78-41c5-9849-169af9b8fe8f",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "OhXLGMGyTLwaB1pi",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "hour": 10
+            }
+          ]
+        },
+        "filters": {}
+      },
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -384,
+        -32
+      ],
+      "id": "a4910526-070a-41ee-a40e-a2900ee55d6e",
+      "name": "Gmail Trigger",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "OhXLGMGyTLwaB1pi",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "filters": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        -176,
+        -32
+      ],
+      "id": "57e27a08-a275-4e0e-a693-93ac60de4064",
+      "name": "Get many messages",
+      "webhookId": "7225af91-3d02-4229-8737-41528abc6c26",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "OhXLGMGyTLwaB1pi",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Add label to message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many messages": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get many messages",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "5e9b44a9-ee5b-4966-bc65-08057bb2c4b9",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "be9898397347908cb5982a23b811f8baa03bf4e1962e896d58fa10234caf4845"
+  },
+  "id": "GTh7Qs9elA2ysaAt",
+  "tags": []
+}

@@ -1,0 +1,229 @@
+{
+  "name": "gsheet automation",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -352,
+        -16
+      ],
+      "id": "e4fd4e32-68bc-49f2-a132-0506f7acb91f",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1OvaPECPYbP8uCc9ftpCZB1KQYFM77sq2bjxm5pcb_oA",
+          "mode": "list",
+          "cachedResultName": "saschic google sheet",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1OvaPECPYbP8uCc9ftpCZB1KQYFM77sq2bjxm5pcb_oA/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1OvaPECPYbP8uCc9ftpCZB1KQYFM77sq2bjxm5pcb_oA/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        -80,
+        16
+      ],
+      "id": "b14b6823-3d76-430d-a02f-01705f9037ac",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "2lIbahaHCrU1RVEL",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=identify the sentiment for the below feedback {{ $json.Review }}"
+            },
+            {
+              "content": "you are an expert in analyzing feedback and identifying the sentiment\n\nyo should give output only either one below\n\npositive\nneutral\nnegative \noutput should only one word \ne.g., positive\n",
+              "role": "system"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        128,
+        16
+      ],
+      "id": "7a43ae4f-8891-4781-a409-50ee20cf67d9",
+      "name": "Message a model",
+      "credentials": {
+        "openAiApi": {
+          "id": "bgowylk4lQbxmiTv",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1OvaPECPYbP8uCc9ftpCZB1KQYFM77sq2bjxm5pcb_oA",
+          "mode": "list",
+          "cachedResultName": "saschic google sheet",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1OvaPECPYbP8uCc9ftpCZB1KQYFM77sq2bjxm5pcb_oA/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1OvaPECPYbP8uCc9ftpCZB1KQYFM77sq2bjxm5pcb_oA/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Customer Name": "={{ $('Get row(s) in sheet').item.json['Customer Name'] }}",
+            "S.No": "={{ $('Get row(s) in sheet').item.json['S.No'] }}",
+            "Review": "={{ $('Get row(s) in sheet').item.json.Review }}",
+            "Sentiment": "={{ $('Get row(s) in sheet').item.json.Sentiment }}",
+            "Analysis": "={{ $('Get row(s) in sheet').item.json.Analysis }}"
+          },
+          "matchingColumns": [
+            "Customer Name"
+          ],
+          "schema": [
+            {
+              "id": "S.No",
+              "displayName": "S.No",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Customer Name",
+              "displayName": "Customer Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Review",
+              "displayName": "Review",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Sentiment",
+              "displayName": "Sentiment",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Analysis",
+              "displayName": "Analysis",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        480,
+        16
+      ],
+      "id": "d7d70c20-c042-4609-8e16-0df999b9bf58",
+      "name": "Append or update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "2lIbahaHCrU1RVEL",
+          "name": "Google Sheets account 2"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Append or update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "26cbfc5c-d7eb-4411-98db-da6641e7e90e",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "be9898397347908cb5982a23b811f8baa03bf4e1962e896d58fa10234caf4845"
+  },
+  "id": "1te2etD65fSjBEkp",
+  "tags": []
+}
